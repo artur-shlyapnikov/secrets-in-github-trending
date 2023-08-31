@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-API="https://api.github.com/search/repositories?q=created:>$(date -v-30d +'%Y-%m-%d')&sort=stars&order=desc"
+API="https://api.github.com/search/repositories?q=created:>$(date -d '30 days ago' +'%Y-%m-%d')&sort=stars&order=desc"
 
 data=$(curl -s $API)
 
