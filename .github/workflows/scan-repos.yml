@@ -1,0 +1,31 @@
+name: Scan Trending Repos
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+
+jobs:
+
+  scan:
+
+    runs-on: ubuntu-latest
+    
+    steps:
+
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install gitleaks
+      run: |
+        wget https://github.com/zricethezav/gitleaks/releases/download/v8.18.0/gitleaks_8.18.0_linux_amd64.tar.gz
+        tar -xzf gitleaks_8.18.0_linux_amd64.tar.gz
+        chmod +x gitleaks
+
+    - name: Clone trending repos  
+      run: |
+        chmod +x get-github-trends.sh
+        ./get-github-trends.sh | parallel --jobs 10 git clone --bare {}
+
+    - name: Run gitleaks
+      run: |
+        parallel --jobs 10 ./gitleaks -v detect --source={} ::: *.git
